@@ -49,16 +49,16 @@ def get_add_doctor(request):
 #this function get all doctor patients or delete all of them
 def get_doctor_patients(request,doctor_id):
     
-        
-        doctor=Doctor.objects.get(pk=doctor_id)
-        if doctor is None:
+        doctor1=Doctor.objects.get(pk=doctor_id)
+        if doctor1 is None:
             return JsonResponse({'message':f'Doctor with id = {doctor_id} not found'},status=status.HTTP_404_NOT_FOUND)
+
+        patients=Prescription.objects.filter(doctor=doctor1)
         if request.method=='GET':
-            patients=Prescription.objects.filter(doctor=doctor)
             serializer=PatientSerializer(patients,many=True)
+            #serializer.data allows to get the data in json format after serialization
             return JsonResponse(serializer.data,status=status.HTTP_200_OK)
         elif request.method=='DELETE':
-            patients=Prescription.objects.filter(doctor=doctor)
             for patient in patients:
                 patient.delete()
             return JsonResponse({'message':f'All patients of doctor with id = {doctor_id} are deleted'},status=status.HTTP_202_ACCEPTED)
