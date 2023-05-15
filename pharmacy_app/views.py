@@ -3,8 +3,9 @@ from rest_framework.decorators import api_view
 
 from pharmacy_app.models import Doctor, Prescription
 from pharmacy_app.serializers import DoctorSerializer, PatientSerializer
-from rest_framework.response import JsonResponse
 from rest_framework import status
+from django.http import JsonResponse
+from rest_framework.response import Response
 # Create your views here.
 #this function gets all the doctors from the database
 #or add a new doctor to the database
@@ -26,7 +27,11 @@ def get_add_doctor(request):
         #the second parameter is the HTTP status code : like 201,400,404,500,202, ...
         #there is other classes like JsonResponse like HttpResponse,FileResponse,StreamingHttpResponse, Response
         #the Response class is used to return data in other formats like XML,HTML,JSON, ...
-        return JsonResponse(serializer.data,status=status.HTTP_200_OK)
+        #safe=False is used to allow non-dict objects to be returned as JSON
+        #return JsonResponse(serializer.data,status=status.HTTP_200_OK,safe=False)
+        #or you can use Response class which return data in other formats like XML,HTML,JSON, ...
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
     elif request.method=='POST':
         #request.data =>to get the data sent by the user in the HTTP request body
         #convert the json data to python object
@@ -57,7 +62,7 @@ def get_doctor_patients(request,doctor_id):
         if request.method=='GET':
             serializer=PatientSerializer(patients,many=True)
             #serializer.data allows to get the data in json format after serialization
-            return JsonResponse(serializer.data,status=status.HTTP_200_OK)
+            return JsonResponse(serializer.data,status=status.HTTP_200_OK,safe=False)
         elif request.method=='DELETE':
             for patient in patients:
                 patient.delete()
